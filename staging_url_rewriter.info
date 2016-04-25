@@ -1,0 +1,4 @@
+name = Image source staging to production rewrite
+description = Rewrite images URLS from staging/development to production to save disk space and make syncing with production faster
+core = 7.x
+configure = admin/config/staging_url_replacment_settings

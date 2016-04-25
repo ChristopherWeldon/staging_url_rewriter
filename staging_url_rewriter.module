@@ -1,0 +1,146 @@
+<?php
+/**
+ * @file
+ * Rewrite images URLS from staging/development to production
+ * so images do not have to be copied and to save disk space
+ */
+
+/**
+ * Implements hook_node_view().
+ *
+ * @param $node
+ * @param $view_mode
+ * @param $langcode
+ * Add Settings to JS so we can access them from the front end
+ * Also include JS file for re-writing the urls
+ */
+function staging_url_rewriter_node_view($node, $view_mode, $langcode)
+{
+    $settings = _staging_url_rewriter_get_settings();
+
+    drupal_add_js(
+        array('staging_url_rewriter' => array('production_base_url' => $settings['staging_url_rewriter_production_url'])),
+        'setting'
+    );
+    drupal_add_js(
+        array('staging_url_rewriter' => array('is_debug' => $settings['staging_url_rewriter_debug'])),
+        'setting'
+    );
+    drupal_add_js(
+        drupal_get_path(
+            'module',
+            'staging_url_rewriter'
+        ) . '/js/staging_url_rewriter.js'
+    );
+}
+
+/**
+ * Admin module config form
+ *
+ * @Implement hook_config_form to create configuration form
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @return Form structure
+ */
+function staging_url_rewriter_form($form, &$form_state)
+{
+    $settings = _staging_url_rewriter_get_settings();
+
+    $isDebug = $settings['webform_dynamic_email_debug'];
+
+    if ($isDebug) {
+        dpm($settings, "Settings");
+    }
+
+    $form['staging_url_rewriter_production_url'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Production URL'),
+        '#description'   => t(
+            'This is the base URL of the production site to try if images result in an error on this site.'
+        ),
+        '#default_value' => $settings['staging_url_rewriter_production_url'],
+        '#size'          => 100,
+        '#maxlength'     => 150,
+        '#required'      => true,
+    );
+
+    $form['staging_url_rewriter_debug'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Debug Mode'),
+        '#default_value' => $settings['staging_url_rewriter_debug'],
+        '#description'   => t(
+            'Enable debug mode and display technical information on front end'
+        ),
+        '#required'      => false,
+    );
+
+    return system_settings_form($form);
+}
+
+/**
+ * @Implement hook_menu
+ * Create configuration menu item on Admin page
+ * @return array
+ */
+function staging_url_rewriter_menu()
+{
+    $items = array();
+
+    $items['admin/config/staging_url_replacment_settings'] = array(
+        'title'            => 'Staging URL Replacement Preferences',
+        'description'      => 'Configuration for replacing URL with production URL when images are broken',
+        'page callback'    => 'drupal_get_form',
+        'page arguments'   => array('staging_url_rewriter_form'),
+        'access arguments' => array('access administration pages'),
+        'type'             => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+}
+
+/**
+ * Get the settings
+ * @array of
+ *        settings[staging_url_rewriter_production_url,staging_url_rewriter_debug]
+ */
+function _staging_url_rewriter_get_settings()
+{
+    $settings = array();
+
+    $settings['staging_url_rewriter_production_url'] = variable_get(
+        'staging_url_rewriter_production_url',
+        _staging_url_rewriter_get_defualt_production_url()
+    );
+
+    $settings['staging_url_rewriter_debug'] = variable_get(
+        'staging_url_rewriter_debug',
+        '0'
+    );
+
+    return $settings;
+}
+
+/**
+ * Set default production url value
+ * Assume we should remove update. and staging. from current url as a default
+ * @return string
+ */
+function _staging_url_rewriter_get_defualt_production_url()
+{
+    global $base_url;
+
+    $default_production_url = $base_url;
+    $default_production_url = str_replace(
+        "update.",
+        "",
+        $default_production_url
+    );
+    $default_production_url = str_replace(
+        "staging.",
+        "",
+        $default_production_url
+    );
+    return $default_production_url;
+}
