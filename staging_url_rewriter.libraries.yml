@@ -1,0 +1,6 @@
+rewrite_url_js:
+  version: 1.0
+  js:
+    js/staging_url_rewriter.js: {}
+  dependencies:
+    - core/drupalSettings

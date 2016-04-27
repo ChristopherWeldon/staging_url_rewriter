@@ -1,0 +1,9 @@
+name: 'Image source staging to production rewrite'
+description: 'Rewrite images URLS from staging/development to production to save disk space and make syncing with production faster'
+core: 8.x
+type: module
+package: Development
+libraries:
+  - staging_url_rewriter/staging_url_rewriter
+versionn: 0.1
+configure: staging_url_rewriter.form
