@@ -1,4 +1,0 @@
-#Allow the module to be in "debug" mode (adds some console.log basically)
-staging_url_rewriter_debug: '0'
-#The default value for this is set in _staging_url_rewriter_get_defualt_production_url
-staging_url_rewriter_production_url: ''
