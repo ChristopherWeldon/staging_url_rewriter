@@ -1,8 +1,0 @@
-staging_url_rewriter.settings:
-  type: mapping
-  label: Settings
-  mapping:
-    staging_url_rewriter_debug:
-      type: string
-    staging_url_rewriter_production_url:
-      type: string
