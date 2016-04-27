@@ -1,0 +1,5 @@
+staging_url_rewriter.form:
+  route_name: staging_url_rewriter.form
+  title: 'Staging URL Replacement Preferences'
+  description: 'Configuration for replacing URL with production URL when images are broken'
+  parent: system.admin_config
